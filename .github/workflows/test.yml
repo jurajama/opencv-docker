@@ -1,0 +1,40 @@
+name: Test Docker Image
+
+on:
+  push:
+    paths:
+      - 'tests/**'
+      - '.github/workflows/test.yml'
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Build and Push Docker Image]
+    types: [completed]
+
+jobs:
+  test-x86:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Pull Docker image
+      run: docker pull ghcr.io/jurajama/opencv-docker:latest
+
+    - name: Run OpenCV test on x86
+      run: |
+        docker run --platform linux/amd64 --rm -v ${{ github.workspace }}/tests/test_opencv.py:/app/test_opencv.py ghcr.io/jurajama/opencv-docker:latest python /app/test_opencv.py
+
+  test-arm:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Pull Docker image
+      run: docker pull ghcr.io/jurajama/opencv-docker:latest
+
+    - name: Run OpenCV test on ARM
+      run: |
+        docker run --platform linux/arm64 --rm -v ${{ github.workspace }}/tests/test_opencv.py:/app/test_opencv.py ghcr.io/jurajama/opencv-docker:latest python /app/test_opencv.py
