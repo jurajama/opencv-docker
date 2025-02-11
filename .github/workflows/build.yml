@@ -28,6 +28,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    # Use cache to speed up the build only for development branches
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
@@ -35,3 +36,6 @@ jobs:
         push: true
         platforms: linux/amd64,linux/arm64
         tags: ghcr.io/jurajama/opencv-docker:latest
+        cache-from: type=gha,scope=${{ github.ref_name }}
+        cache-to: type=gha,mode=max,scope=${{ github.ref_name }}
+        no-cache: ${{ github.ref == 'refs/heads/main' }}
