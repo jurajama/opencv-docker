@@ -34,7 +34,6 @@ jobs:
       run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
     - name: Build and push Docker image
-      if: not ${{ env.version }}
       uses: docker/build-push-action@v6
       with:
         context: .
@@ -52,9 +51,7 @@ jobs:
         context: .
         push: true
         platforms: linux/amd64,linux/arm64
-        tags: |
-          ghcr.io/jurajama/opencv-docker:latest
-          ghcr.io/jurajama/opencv-docker:${{ env.version }}
+        tags: ghcr.io/jurajama/opencv-docker:${{ env.version }}
         cache-from: type=gha,scope=${{ github.ref_name }}
         cache-to: type=gha,mode=max,scope=${{ github.ref_name }}
         no-cache: ${{ github.ref == 'refs/heads/main' }}
